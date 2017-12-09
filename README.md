@@ -53,6 +53,7 @@ The methods you'll need to use are:
 
 As you might have noticed the default is a 6 by 6 sudoku grid because it fit better on my console than a 9x9.
 
+Once you fill in the last box, if your solution is valid you'll get a congratulations message
 
 ## Other options
 
