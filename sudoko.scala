@@ -49,9 +49,8 @@ class Game(val size: Int) {
 		int > 0 && int < size + 1
 	}
 
-	def viewBoard = {
+	def viewBoard {
 		println(this)
-		this
 	}
 
 	private def placeUneraseableBoxAt(coordinate: (Int, Int), value: Int) = {
