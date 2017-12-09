@@ -53,3 +53,21 @@ The methods you'll need to use are:
 
 As you might have noticed the default is a 6 by 6 sudoku grid because it fit better on my console than a 9x9.
 
+
+## Other options
+
+If you want to play a larger game board you can do so by specifying the game size like so:
+
+```
+Game.newGame(size = 9) // Makes a 9x9 game board with 2 initial values per row
+```
+
+If you want to have more than 2 values pre-populated then you can set that:
+
+```
+Game.newGame(initialValuesPerRow = 3)
+```
+
+I don't recommend putting that value too high though, you might just get the game to spin 
+your CPU up since it has reached an impossible grid and can't stop. 2 or 3 seem to be fine
+depending on your board size.
