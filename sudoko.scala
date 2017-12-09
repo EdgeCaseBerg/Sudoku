@@ -186,15 +186,23 @@ class Game(val size: Int) {
 }
 
 object Game {
-	def newGame(size: Int = 6) = {
+	def newGame(size: Int = 6, initialValuesPerRow: Int = 2) = {
+		require(initialValuesPerRow <= size)
 		println("Creating new game...")
 		val g = new Game(size)
-		/* Randomly generate a grid filled with 2 values in each row */
+		/* Randomly generate a grid filled with 'initialValuesPerRow' values in each row 
+		 * Note that if you pass initialValuesPerRow = size you've just asked the system
+		 * to try to generate a board that is completely solved at random. Which will 
+		 * take a long time, not to mention it might not be possible anyway since we don't
+		 * ever do any backtracking after we've move down a row. So yeah, basically just
+		 * stick with 2 for the initial values, or maybe 3 if you've got a larger board than
+		 * 6.
+		 */
 		import scala.util.Random
 		(1 to size).foreach { y =>
 			var placed = Set.empty[(Int, Int)]
 			var values = Set.empty[Int]
-			while(placed.size < 2) {
+			while(placed.size < initialValuesPerRow) {
 				val coordinate = {
 					var r = (Random.nextInt(size) + 1, y)
 					while(placed.contains(r)) {
