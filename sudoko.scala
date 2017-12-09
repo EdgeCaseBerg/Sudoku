@@ -170,9 +170,8 @@ class Game(val size: Int) {
 }
 
 object Game {
-	def newGame() = {
+	def newGame(size: Int = 6) = {
 		println("Creating new game...")
-		val size = 6
 		val g = new Game(size)
 		/* Randomly generate a grid filled with 2 values in each row */
 		import scala.util.Random
