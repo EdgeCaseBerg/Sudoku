@@ -94,7 +94,7 @@ class Game(val size: Int) {
 		require(inGrid(value))
 
 		boxes(y)(x) match {
-			case ueb: UnEraseableBox => this
+			case ueb: UnEraseableBox => // no op
 			case _ => {
 				boxes = {
 					boxes.updated(
@@ -102,9 +102,10 @@ class Game(val size: Int) {
 						boxes(y).updated(x, FilledBox(value))
 					)
 				}
-				this
 			}
 		}
+		isGameOver_?
+		this
 	}
 
 	def eraseBoxAt(coordinate: (Int, Int)) = {
@@ -165,7 +166,22 @@ class Game(val size: Int) {
 			}
 		}
 		isValid
-	}	
+	}
+
+	private def isGameOver_? = {
+		var thereAreEmptyBoxes = false
+		(1 to size).foreach { y =>
+			(1 to size).foreach { x =>
+				boxes(y)(x) match {
+					case EmptyBox => thereAreEmptyBoxes = true
+					case _ => // no op
+				}
+			}
+		}
+		if(!thereAreEmptyBoxes && isSolutionValid_?) {
+			println("Congratulations! You've won!")
+		}
+	}
 
 }
 
