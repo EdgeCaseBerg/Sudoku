@@ -84,6 +84,7 @@ class Game(val size: Int) {
 				boxes(y).updated(x, EmptyBox)
 			)
 		}
+		this
 	}
 
 	def fillBoxAt(coordinate: (Int, Int), value: Int) = {
