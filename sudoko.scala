@@ -33,7 +33,7 @@ class Game(val size: Int) {
 					/* The perimeter */
 					case (0, 0) | (0, `y`) | (`x`, 0) | (`w`, `h`) => OutOfBounds
 					case (`w`, _) | (_, `h`) => OutOfBounds
-					/* The corners */
+					/* The center */
 					case _ => EmptyBox
 				}
 			}
