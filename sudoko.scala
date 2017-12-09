@@ -177,13 +177,13 @@ object Game {
 		/* Randomly generate a grid filled with 2 values in each row */
 		import scala.util.Random
 		(1 to size).foreach { y =>
-			var placed = Set.empty[Int]
+			var placed = Set.empty[(Int, Int)]
 			var values = Set.empty[Int]
 			while(placed.size < 2) {
-				val x = {
-					var r = Random.nextInt(size) + 1
+				val coordinate = {
+					var r = (Random.nextInt(size) + 1, y)
 					while(placed.contains(r)) {
-						r = Random.nextInt(size) + 1
+						r = (Random.nextInt(size) + 1, y)
 					}
 					r
 				}
@@ -195,12 +195,12 @@ object Game {
 					r
 				}
 
-				g.placeUneraseableBoxAt((x,y), value)
+				g.placeUneraseableBoxAt(coordinate, value)
 				if (g.isSolutionValid_?) {
-					placed += x
+					placed += coordinate
 					values += value
 				} else {
-					g.eraseUneraseableBoxAt((x,y))
+					g.eraseUneraseableBoxAt(coordinate)
 				}
 			}
 		}
