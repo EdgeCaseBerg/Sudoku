@@ -60,13 +60,18 @@ class Game(val size: Int) {
 		require(inGrid(y))
 		require(inGrid(value))
 
-		boxes = {
-			boxes.updated(
-				y, 
-				boxes(y).updated(x, UnEraseableBox(value))
-			)
+		boxes(y)(x) match {
+			case ueb: UnEraseableBox => this
+			case _ => {
+				boxes = {
+					boxes.updated(
+						y, 
+						boxes(y).updated(x, UnEraseableBox(value))
+					)
+				}
+				this
+			}
 		}
-		this
 	}
 
 	private def eraseUneraseableBoxAt(coordinate: (Int, Int)) = {
