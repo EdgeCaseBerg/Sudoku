@@ -18,7 +18,12 @@ case class FilledBox(value: Int) extends Box {
 	override def toString: String = s""" ${value} """
 }
 
-class Grid(val size: Int) {
+case class UnEraseableBox(value: Int) extends Box {
+	def isOutOfBounds = false
+	override def toString: String = s""" ${value} """
+}
+
+class Game(val size: Int) {
 	private var boxes = {
 		(0 to size + 1).map { y =>
 			(0 to size + 1).map { x =>
@@ -49,7 +54,7 @@ class Grid(val size: Int) {
 		this
 	}
 
-	def fillBoxAt(coordinate: (Int, Int), value: Int) = {
+	private def placeUneraseableBoxAt(coordinate: (Int, Int), value: Int) = {
 		val (x,y) = coordinate
 		require(inGrid(x))
 		require(inGrid(y))
@@ -58,13 +63,13 @@ class Grid(val size: Int) {
 		boxes = {
 			boxes.updated(
 				y, 
-				boxes(y).updated(x, FilledBox(value))
+				boxes(y).updated(x, UnEraseableBox(value))
 			)
 		}
 		this
 	}
 
-	def eraseBoxAt(coordinate: (Int, Int)) = {
+	private def eraseUneraseableBoxAt(coordinate: (Int, Int)) = {
 		val (x,y) = coordinate
 		require(inGrid(x))
 		require(inGrid(y))
@@ -75,7 +80,71 @@ class Grid(val size: Int) {
 				boxes(y).updated(x, EmptyBox)
 			)
 		}
-		this
+	}
+
+	def fillBoxAt(coordinate: (Int, Int), value: Int) = {
+		val (x,y) = coordinate
+		require(inGrid(x))
+		require(inGrid(y))
+		require(inGrid(value))
+
+		boxes(y)(x) match {
+			case ueb: UnEraseableBox => this
+			case _ => {
+				boxes = {
+					boxes.updated(
+						y, 
+						boxes(y).updated(x, FilledBox(value))
+					)
+				}
+				this
+			}
+		}
+	}
+
+	def eraseBoxAt(coordinate: (Int, Int)) = {
+		val (x,y) = coordinate
+		require(inGrid(x))
+		require(inGrid(y))
+
+		boxes(y)(x) match {
+			case ueb: UnEraseableBox => this
+			case _ => {
+				boxes = {
+					boxes.updated(
+						y, 
+						boxes(y).updated(x, EmptyBox)
+					)
+				}
+				this
+			}
+		}
+	}
+
+	private def checkBox(x: Int, y: Int, value: Int, validOutSideThisRow: Boolean) = {
+		var isValid = true
+		/* Does this value appear above/below us? */
+		(1  to y - 1) ++ (y + 1 to size) foreach { aboveOrBelow =>
+			boxes(aboveOrBelow)(x) match {
+				case FilledBox(otherValue) => 
+					isValid = value != otherValue
+				case UnEraseableBox(otherValue) => 
+					isValid = value != otherValue
+				case EmptyBox | OutOfBounds => // NoOp 
+			}
+		}
+
+		/* Does this value appear to the left/right of us? */
+		(1 to x - 1) ++ (x + 1 to size) foreach { leftOrRight =>
+			boxes(y)(leftOrRight) match {
+				case FilledBox(otherValue) => 
+					isValid = value != otherValue
+				case UnEraseableBox(otherValue) => 
+					isValid = value != otherValue
+				case EmptyBox | OutOfBounds=> // NoOp
+			}
+		}
+		validOutSideThisRow && isValid
 	}
 
 	def isSolutionValid_? = {
@@ -85,25 +154,8 @@ class Grid(val size: Int) {
 			(1 to size).foreach { x =>
 				boxes(y)(x) match {
 					case EmptyBox | OutOfBounds => // No Op
-					case FilledBox(value) => {
-						/* Does this value appear above/below us? */
-						(1  to y - 1) ++ (y + 1 to size) foreach { aboveOrBelow =>
-							boxes(aboveOrBelow)(x) match {
-								case FilledBox(otherValue) => 
-									isValid = value != otherValue
-								case EmptyBox | OutOfBounds=> // NoOp 
-							}
-						}
-
-						/* Does this value appear to the left/right of us? */
-						(1 to x - 1) ++ (x + 1 to size) foreach { leftOrRight =>
-							boxes(y)(leftOrRight) match {
-								case FilledBox(otherValue) => 
-									isValid = value != otherValue
-								case EmptyBox | OutOfBounds=> // NoOp
-							}
-						}
-					}
+					case FilledBox(value) => isValid = checkBox(x,y,value, isValid)
+					case UnEraseableBox(value) => isValid = checkBox(x,y,value, isValid)
 				}
 			}
 		}
@@ -116,7 +168,7 @@ object Game {
 	def newGame() = {
 		println("Creating new game...")
 		val size = 6
-		val g = new Grid(size)
+		val g = new Game(size)
 		/* Randomly generate a grid filled with 2 values in each row */
 		import scala.util.Random
 		(1 to size).foreach { y =>
@@ -138,12 +190,12 @@ object Game {
 					r
 				}
 
-				g.fillBoxAt((x,y), value)
+				g.placeUneraseableBoxAt((x,y), value)
 				if (g.isSolutionValid_?) {
 					placed += x
 					values += value
 				} else {
-					g.eraseBoxAt((x,y))
+					g.eraseUneraseableBoxAt((x,y))
 				}
 			}
 		}
