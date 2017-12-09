@@ -42,9 +42,8 @@ res0: Grid =
 ---+---+---+---+---+---+---+---
 ```
 
-From then on you can call a method on your `res#` to make a change. Remember
-though, it is immutable since you're in scala, so you'll want to keep that 
-in mind. The methods you'll need to use are:
+From then on you can call a method on your `res#` to make a change. 
+The methods you'll need to use are:
 
 
 - `viewBoard`: Prints the board to the console
