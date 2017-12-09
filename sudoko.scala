@@ -127,25 +127,25 @@ class Game(val size: Int) {
 	}
 
 	private def checkBox(x: Int, y: Int, value: Int, validOutSideThisRow: Boolean) = {
-		var isValid = true
+		var isValid = validOutSideThisRow
 		/* Does this value appear above/below us? */
-		(1  to y - 1) ++ (y + 1 to size) foreach { aboveOrBelow =>
+		(0  to (size + 1)).filterNot(_ == y).foreach { aboveOrBelow =>
 			boxes(aboveOrBelow)(x) match {
 				case FilledBox(otherValue) => 
-					isValid = value != otherValue
+					isValid = isValid && value != otherValue
 				case UnEraseableBox(otherValue) => 
-					isValid = value != otherValue
+					isValid = isValid && value != otherValue
 				case EmptyBox | OutOfBounds => // NoOp 
 			}
 		}
 
 		/* Does this value appear to the left/right of us? */
-		(1 to x - 1) ++ (x + 1 to size) foreach { leftOrRight =>
+		(0 to (size + 1)).filterNot(_ == x).foreach { leftOrRight =>
 			boxes(y)(leftOrRight) match {
 				case FilledBox(otherValue) => 
-					isValid = value != otherValue
+					isValid = isValid && value != otherValue
 				case UnEraseableBox(otherValue) => 
-					isValid = value != otherValue
+					isValid = isValid && value != otherValue
 				case EmptyBox | OutOfBounds=> // NoOp
 			}
 		}
